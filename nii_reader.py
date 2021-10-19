@@ -7,6 +7,7 @@ import random
 import string
 import tempfile
 import urllib.request
+import numpy as np
 from typing import Dict, Optional
 
 import nibabel.filebasedimages
@@ -14,6 +15,7 @@ from jina import Executor, DocumentArray, requests, Document
 from jina.logging.logger import JinaLogger
 from jina.types.document import _is_datauri
 from monai.data.image_reader import NibabelReader
+from monai.config import DtypeLike
 
 
 class NiiReader(Executor):
@@ -25,6 +27,7 @@ class NiiReader(Executor):
         self,
         as_closest_canonical: bool = False,
         nibabel_args: Optional[Dict] = None,
+        dtype: DtypeLike = np.float32,
         *args,
         **kwargs,
     ):
@@ -32,12 +35,17 @@ class NiiReader(Executor):
         :param as_closest_canonical: if True, load the image as closest to canonical axis format.
         :param nibabel_args: additional args for `nibabel.load` API. more details about available args:
             https://github.com/nipy/nibabel/blob/master/nibabel/loadsave.py
+        :param dtype: dtype which the image will be converted to
         :param args: the *args for Executor
         :param kwargs: the **kwargs for Executor
         """
         super().__init__(*args, **kwargs)
         self.nibabel_args = nibabel_args or {}
-        self.reader = NibabelReader(as_closest_canonical, **self.nibabel_args)
+        self.dtype = dtype or np.float32
+        self.as_closest_canonical = as_closest_canonical or False
+        self.reader = NibabelReader(
+            self.as_closest_canonical, self.dtype, **self.nibabel_args
+        )
         self.logger = JinaLogger(
             getattr(self.metas, 'name', self.__class__.__name__)
         ).logger
@@ -74,6 +82,8 @@ class NiiReader(Executor):
         except nibabel.filebasedimages.ImageFileError as e:
             file_extension = '.'.join(os.path.basename(uri).split('.')[1:])
             self.logger.error(f'Cannot work out file type of "*.{file_extension}"')
+        except FileNotFoundError as e:
+            self.logger.error(f'No such file or no access: "{uri}"')
         finally:
             return img
 
