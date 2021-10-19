@@ -1,0 +1,1 @@
+Load NIfTI format images based on Nibabel library.

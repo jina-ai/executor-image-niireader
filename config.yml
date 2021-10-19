@@ -1,0 +1,4 @@
+jtype: NiiReader
+metas:
+  py_modules:
+    - nii_reader.py
