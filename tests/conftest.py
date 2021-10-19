@@ -1,14 +1,11 @@
-import pytest
-from PIL import Image
-import librosa
 import os
-import subprocess
 from pathlib import Path
 
-import numpy as np
-from nibabel.testing import data_path
-from nii_reader import NiiReader
 import nibabel as nib
+import pytest
+from nibabel.testing import data_path
+
+from nii_reader import NiiReader
 
 data_dir = (Path(__file__).parent / 'toy_data').absolute()
 

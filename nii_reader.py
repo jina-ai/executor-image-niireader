@@ -7,15 +7,15 @@ import random
 import string
 import tempfile
 import urllib.request
-import numpy as np
 from typing import Dict, Optional
 
 import nibabel.filebasedimages
-from jina import Executor, DocumentArray, requests, Document
+import numpy as np
+from jina import Executor, DocumentArray, requests
 from jina.logging.logger import JinaLogger
 from jina.types.document import _is_datauri
-from monai.data.image_reader import NibabelReader
 from monai.config import DtypeLike
+from monai.data.image_reader import NibabelReader
 
 
 class NiiReader(Executor):
