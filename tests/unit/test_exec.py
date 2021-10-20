@@ -66,9 +66,9 @@ def test_catch_no_file(caplog, nii_reader: NiiReader):
     assert 'No such file' in caplog.text
 
 
-def test_dtype_string(expected_image, image_fn):
+def test_dtype_primitive(expected_image, image_fn):
     docs = DocumentArray([Document(uri=image_fn)])
-    niiReader = NiiReader(dtype=None)
+    niiReader = NiiReader(dtype=float)
     niiReader.load(docs=docs)
     for doc in docs:
         np.testing.assert_allclose(doc.blob.shape, expected_image.shape)
