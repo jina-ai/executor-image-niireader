@@ -65,7 +65,7 @@ class NiiReader(Executor):
         ).logger
 
     @requests
-    def load(self, docs: Optional[DocumentArray] = None, **kwargs):
+    def load(self, docs: DocumentArray, **kwargs):
         """
         Load the NIfTI images available in the format `.nii` or `.nii.gz` from the Document.uri and store it in the `blob`
         of `Document` as an ndarray. Check out `https://nifti.nimh.nih.gov/nifti-2/` for the Data Format and shape
