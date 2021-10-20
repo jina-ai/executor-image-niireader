@@ -15,52 +15,61 @@ def test_config():
     assert ex.dtype == np.float32
 
 
-def test_no_documents(niiReader: NiiReader):
+def test_no_documents(nii_reader: NiiReader):
     docs = DocumentArray()
-    niiReader.load(docs=docs)
+    nii_reader.load(docs=docs)
     assert len(docs) == 0  # SUCCESS
 
 
-def test_docs_no_uris(niiReader: NiiReader):
+def test_docs_no_uris(nii_reader: NiiReader):
     docs = DocumentArray([Document()])
-    niiReader.load(docs=docs)
+    nii_reader.load(docs=docs)
     assert len(docs) == 1
     assert len(docs[0].chunks) == 0
 
 
 @pytest.mark.parametrize('batch_size', [1, 2, 4, 8])
-def test_batch_extract(expected_image, image_fn, niiReader: NiiReader, batch_size: int):
+def test_batch_extract(expected_image, image_fn, nii_reader: NiiReader, batch_size: int):
     docs = DocumentArray([Document(uri=image_fn) for _ in range(batch_size)])
-    niiReader.load(docs=docs)
+    nii_reader.load(docs=docs)
     for doc in docs:
         np.testing.assert_allclose(doc.blob.shape, expected_image.shape)
         np.testing.assert_allclose(doc.blob, expected_image.get_fdata())
 
 
-def test_load_with_datauri(expected_image, image_fn, niiReader: NiiReader):
+def test_load_with_datauri(expected_image, image_fn, nii_reader: NiiReader):
     doc = Document(uri=image_fn)
     doc.convert_uri_to_datauri()
     docs = DocumentArray([doc])
-    niiReader.load(docs=docs)
+    nii_reader.load(docs=docs)
 
     for doc in docs:
         np.testing.assert_allclose(doc.blob.shape, expected_image.shape)
         np.testing.assert_allclose(doc.blob, expected_image.get_fdata())
 
 
-def test_catch_wrong_format(caplog, niiReader: NiiReader):
+def test_catch_wrong_format(caplog, nii_reader: NiiReader):
     docs = DocumentArray(
         [Document(uri='tests/toy_data/example4d.ni.gz')]
     )  # wrong nifti format
-    niiReader.logger.propagate = True
-    niiReader.load(docs=docs)
+    nii_reader.logger.propagate = True
+    nii_reader.load(docs=docs)
     assert 'Cannot work out file' in caplog.text
 
 
-def test_catch_no_file(caplog, niiReader: NiiReader):
+def test_catch_no_file(caplog, nii_reader: NiiReader):
     docs = DocumentArray(
         [Document(uri='tests/toy_data/example5d.ni.gz')]
     )  # no such file exists
-    niiReader.logger.propagate = True
-    niiReader.load(docs=docs)
+    nii_reader.logger.propagate = True
+    nii_reader.load(docs=docs)
     assert 'No such file' in caplog.text
+
+
+def test_dtype_string(expected_image, image_fn):
+    docs = DocumentArray([Document(uri=image_fn)])
+    niiReader = NiiReader(dtype=None)
+    niiReader.load(docs=docs)
+    for doc in docs:
+        np.testing.assert_allclose(doc.blob.shape, expected_image.shape)
+        np.testing.assert_allclose(doc.blob, expected_image.get_fdata())

@@ -23,5 +23,5 @@ def expected_image():
 
 
 @pytest.fixture(scope='function')
-def niiReader():
+def nii_reader():
     return NiiReader()
