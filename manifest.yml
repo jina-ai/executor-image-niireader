@@ -1,2 +1,5 @@
 manifest_version: 1
 name: NiiReader
+description: An executor that loads `NIfTI` format images into Jina Documents based on `Nibabel` library
+url: https://github.com/jina-ai/executor-image-niireader
+keywords: [images, medical, fMRI, loader, NifTI, Nibabel, nii]
